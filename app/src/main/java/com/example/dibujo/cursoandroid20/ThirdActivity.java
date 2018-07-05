@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -33,7 +34,22 @@ public class ThirdActivity extends AppCompatActivity {
         txtweb = findViewById(R.id.imgBtnWeb);
         txtcam = findViewById(R.id.imgBtnCamera);
         txtphone.setOnClickListener(new call());
+        txtweb.setOnClickListener(new buscar());
 
+    }
+    private class buscar implements View.OnClickListener
+    {
+
+        @Override
+        public void onClick(View view) {
+            if(!web.getText().toString().isEmpty())
+            {
+                Intent i=new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("https://"+web.getText().toString()));
+                startActivity(i);
+
+            }
+        }
     }
 
     @Override
@@ -73,7 +89,7 @@ public class ThirdActivity extends AppCompatActivity {
                 }
 
             } else {
-                Toast.makeText(ThirdActivity.this, "ERROR NEW", Toast.LENGTH_LONG).show();
+                Toast.makeText(ThirdActivity.this, "ERROR DE NUMERO", Toast.LENGTH_LONG).show();
             }
 
         }
@@ -89,7 +105,22 @@ public class ThirdActivity extends AppCompatActivity {
         @RequiresApi(api = Build.VERSION_CODES.M)
         private void newerVersions()
         {
-            requestPermissions(new String[]{Manifest.permission.CALL_PHONE},PHONE_CALL_CODE);
+            if(!shouldShowRequestPermissionRationale(Manifest.permission.CALL_PHONE))
+            {
+                requestPermissions(new String[]{Manifest.permission.CALL_PHONE},PHONE_CALL_CODE);
+            }
+            else
+            {
+                Toast.makeText(ThirdActivity.this,"ACTIVE LOS PERMISOS DE LLAMADA",Toast.LENGTH_LONG).show();
+                Intent i=new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                i.addCategory(Intent.CATEGORY_DEFAULT);
+                i.setData(Uri.parse("package"+getPackageName()));
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                startActivity(i);
+
+            }
         }
     }
     private boolean checarPermiso(String permiso){
